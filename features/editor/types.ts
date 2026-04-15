@@ -52,6 +52,8 @@ export type BuildEditorProps = {
     setStrokeColor: (value: string) => void;
     setStrokeWidth: (value: number) => void;
     selectedObjects: fabric.Object[];
+    strokeDashArray: number[];
+    setstrokeDashArray: (values:number[]) => void;
 }
 
 export interface Editor {
@@ -64,9 +66,11 @@ export interface Editor {
     setFillColor: (value: string) => void;
     setStrokeWidth: (value: number) => void;
     setStrokeColor: (value: string) => void;
+    changeStrokeDashArray: (value: number[]) => void;
     getActiveFillColor: () => string;
     getActiveStrokeColor: () => string;
-    strokeWidth: number;
+    getActiveStrokeWidth: () => number;
+    getActiveStrokeDashArray: () => number[];
     canvas: fabric.Canvas;
     selectedObjects: fabric.Object[];
 }
@@ -74,7 +78,7 @@ export interface Editor {
 export const FILL_COLOR = "rgba(0,0,0,1)";
 export const STROKE_COLOR = "rgba(0,0,0,1)";
 export const STROKE_WIDTH = 2;
-
+export const STROKE_DASH_ARRAY = [];
 export const CIRCLE_OPTIONS = {
     radius: 150,
     left: 100,
