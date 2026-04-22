@@ -1,7 +1,7 @@
 import { useCallback, useState, useMemo } from "react";
 import { fabric } from "fabric";
 import { useAutoResize } from "./use-auto-resize";
-import { BuildEditorProps, CIRCLE_OPTIONS, Editor, EditorHookProps, FILL_COLOR, RECTANGLE_OPTIONS, STROKE_COLOR, STROKE_DASH_ARRAY, STROKE_WIDTH, TRIANGLE_OPTIONS } from "../types";
+import { BuildEditorProps, CIRCLE_OPTIONS, Editor, EditorHookProps, FILL_COLOR, RECTANGLE_OPTIONS, STROKE_COLOR, STROKE_DASH_ARRAY, STROKE_WIDTH, TEXT_OPTIONS, TRIANGLE_OPTIONS } from "../types";
 import { useCanvasEvents } from "./use-canvas-events";
 import { isTextType } from "../utils";
 
@@ -36,6 +36,44 @@ const buildEditor = ({
         canvas.setActiveObject(object);
     }
     return {
+        addText: () => {
+            const object = new fabric.Textbox("Hello", {
+                ...TEXT_OPTIONS,
+                fill: fillColor,
+            });
+            addToCnavas(object);
+        },
+        bringForward: () => {
+            canvas.getActiveObjects().forEach((object) => {
+                canvas.bringForward(object);
+            });
+            canvas.renderAll()
+            const workspace = getWorkspace();
+            workspace?.sendToBack();
+        },
+        sendBackwords: () => {
+            canvas.getActiveObjects().forEach((object) => {
+                canvas.sendBackwards(object);
+            });
+            canvas.renderAll()
+        },
+        getActiveOpacity: () => {
+            const selectedObject = selectedObjects[0];
+
+            if (!selectedObject) {
+                return 1;
+            }
+            const value = selectedObject.get("opacity") || 1;
+
+            //currently, gradients & patterns are not supported
+            return value;
+        },
+        changeOpacity: (value: number) => {
+            canvas.getActiveObjects().forEach((object) => {
+                object.set({opacity: value})
+            })
+            canvas.renderAll();
+        },
         setFillColor: (value: string) => {
             setFillColor(value);
             canvas.getActiveObjects().forEach((object) => {
@@ -244,7 +282,7 @@ export const useEditor = ({
                 setStrokeWidth,
                 selectedObjects,
                 strokeDashArray,
-                setstrokeDashArray
+                setstrokeDashArray,
             });
         }
         return undefined;

@@ -1,5 +1,6 @@
 import { fabric } from "fabric";
 import * as material from "material-colors";
+import { BiFontFamily } from "react-icons/bi";
 
 export const selectionDependentTools = [
     "fill",
@@ -53,7 +54,8 @@ export type BuildEditorProps = {
     setStrokeWidth: (value: number) => void;
     selectedObjects: fabric.Object[];
     strokeDashArray: number[];
-    setstrokeDashArray: (values:number[]) => void;
+    setstrokeDashArray: (values: number[]) => void;
+    
 }
 
 export interface Editor {
@@ -71,6 +73,11 @@ export interface Editor {
     getActiveStrokeColor: () => string;
     getActiveStrokeWidth: () => number;
     getActiveStrokeDashArray: () => number[];
+    changeOpacity: (value: number) => void;
+    getActiveOpacity: () => number;
+    bringForward: () => void;
+    sendBackwords: () => void;
+    addText: () => void;
     canvas: fabric.Canvas;
     selectedObjects: fabric.Object[];
 }
@@ -79,6 +86,9 @@ export const FILL_COLOR = "rgba(0,0,0,1)";
 export const STROKE_COLOR = "rgba(0,0,0,1)";
 export const STROKE_WIDTH = 2;
 export const STROKE_DASH_ARRAY = [];
+export const FONT_SIZE = 32;
+export const FONT_FAMILY = "Arial";
+
 export const CIRCLE_OPTIONS = {
     radius: 150,
     left: 100,
@@ -108,4 +118,12 @@ export const TRIANGLE_OPTIONS = {
     width: 400,
     height: 400,
     angle: 0
+}
+export const TEXT_OPTIONS = {
+    type: "textbox",
+    left: 100,
+    top: 100,
+    fill: FILL_COLOR,
+    fontSize: FONT_SIZE,
+    fontFamily: FONT_FAMILY,
 }
