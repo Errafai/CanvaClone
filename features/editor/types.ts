@@ -1,6 +1,29 @@
 import { fabric } from "fabric";
+import { ITextboxOptions } from "fabric/fabric-impl";
 import * as material from "material-colors";
 import { BiFontFamily } from "react-icons/bi";
+
+
+export const fonts = [
+    "Arial",
+    "Arial Black",
+    "Verdana",
+    "Helvetica",
+    "Tahoma",
+    "Trebuchet MS",
+    "Times New Roman",
+    "Georgia",
+    "Garamond",
+    "Courier New",
+    "Brush Script MT",
+    "Palatino",
+    "Bookman",
+    "Comic Sans MS",
+    "Impact",
+    "Lucida Sans Unicode",
+    "Geneva",
+    "Lucida Console",
+];
 
 export const selectionDependentTools = [
     "fill",
@@ -42,23 +65,26 @@ export type ActiveTool = | "select" | "shapes" | "text" | "draw" | "images"
 
 export interface EditorHookProps {
     clearSelectionCallback?: () => void;
-    
+
 }
 export type BuildEditorProps = {
     canvas: fabric.Canvas;
     fillColor: string;
     strokeWidth: number;
     strokeColor: string;
-    setFillColor: (value: string  ) => void;
+    setFillColor: (value: string) => void;
     setStrokeColor: (value: string) => void;
     setStrokeWidth: (value: number) => void;
     selectedObjects: fabric.Object[];
     strokeDashArray: number[];
-    setstrokeDashArray: (values: number[]) => void;
-    
+    setStrokeDashArray: (values: number[]) => void;
+    fontFamily: string;
+    setFontFamily: (value: string) => void;
+
 }
 
 export interface Editor {
+    delete: () => void;
     addCircle: () => void;
     addSoftRectangle: () => void;
     addRectangle: () => void;
@@ -77,9 +103,24 @@ export interface Editor {
     getActiveOpacity: () => number;
     bringForward: () => void;
     sendBackwords: () => void;
-    addText: () => void;
+    addText: (value: string, options?: ITextboxOptions) => void;
     canvas: fabric.Canvas;
     selectedObjects: fabric.Object[];
+    changeFontFamily: (value: string) => void;
+    getActiveFontFamily: () => string;
+    getActiveFontWeight: () => number;
+    changeFontWeight: (value: number) => void;
+    changeFontStyle: (value: string) => void;
+    getActiveFontStyle: () => string;
+    changeFontUnderline: (value: boolean) => void;
+    getActiveFontUnderline: () => boolean;
+    changeFontLinethrough: (value: boolean) => void;
+    getActiveFontLinethrough: () => boolean;
+    changeTextAlign: (value: string) => void;
+    getActiveTextAlign: () => string;
+    changeFontSize: (value: number) => void;
+    getActiveFontSize: () => number;
+    addImage: (value: string) => void;
 }
 
 export const FILL_COLOR = "rgba(0,0,0,1)";
@@ -88,7 +129,7 @@ export const STROKE_WIDTH = 2;
 export const STROKE_DASH_ARRAY = [];
 export const FONT_SIZE = 32;
 export const FONT_FAMILY = "Arial";
-
+export const FONT_WEIGHT = 500;
 export const CIRCLE_OPTIONS = {
     radius: 150,
     left: 100,
@@ -106,7 +147,7 @@ export const RECTANGLE_OPTIONS = {
     strokeWidth: STROKE_WIDTH,
     width: 400,
     height: 400,
-    angle:0
+    angle: 0
 }
 
 export const TRIANGLE_OPTIONS = {

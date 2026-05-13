@@ -1,9 +1,10 @@
 import { useCallback, useState, useMemo } from "react";
 import { fabric } from "fabric";
 import { useAutoResize } from "./use-auto-resize";
-import { BuildEditorProps, CIRCLE_OPTIONS, Editor, EditorHookProps, FILL_COLOR, RECTANGLE_OPTIONS, STROKE_COLOR, STROKE_DASH_ARRAY, STROKE_WIDTH, TEXT_OPTIONS, TRIANGLE_OPTIONS } from "../types";
+import { BuildEditorProps, CIRCLE_OPTIONS, Editor, EditorHookProps, FILL_COLOR, FONT_FAMILY, RECTANGLE_OPTIONS, STROKE_COLOR, STROKE_DASH_ARRAY, FONT_WEIGHT, STROKE_WIDTH, TEXT_OPTIONS, TRIANGLE_OPTIONS, FONT_SIZE } from "../types";
 import { useCanvasEvents } from "./use-canvas-events";
 import { isTextType } from "../utils";
+import { ITextboxOptions } from "fabric/fabric-impl";
 
 const buildEditor = ({
     canvas,
@@ -15,7 +16,9 @@ const buildEditor = ({
     setStrokeWidth,
     selectedObjects,
     strokeDashArray,
-    setstrokeDashArray
+    setStrokeDashArray,
+    fontFamily,
+    setFontFamily
 
 }: BuildEditorProps): Editor => {
     const getWorkspace = () => {
@@ -36,10 +39,31 @@ const buildEditor = ({
         canvas.setActiveObject(object);
     }
     return {
-        addText: () => {
-            const object = new fabric.Textbox("Hello", {
+        addImage: (value: string) => {
+            fabric.Image.fromURL(value, (image) => {
+                const workspace = getWorkspace();
+
+                image.scaleToWidth(workspace?.width || 0);
+                image.scaleToHeight(workspace?.height || 0);
+                addToCnavas(image);
+            },
+                {
+                crossOrigin: "anonymous"
+            })
+        },
+        delete: () => {
+            canvas.getActiveObjects().forEach((object) => {
+                canvas.remove(object)
+            });
+            canvas.discardActiveObject();
+            canvas.renderAll();
+
+        },
+        addText: (value: string, options?: ITextboxOptions) => {
+            const object = new fabric.Textbox(value, {
                 ...TEXT_OPTIONS,
                 fill: fillColor,
+                ...options
             });
             addToCnavas(object);
         },
@@ -68,10 +92,68 @@ const buildEditor = ({
             //currently, gradients & patterns are not supported
             return value;
         },
+        changeFontWeight: (value: number) => {
+            canvas.getActiveObjects().forEach((object) => {
+                if (isTextType(object.type)) {
+                    (object as any).set({ fontWeight: value })
+                }
+            })
+            canvas.renderAll();
+        },
+        changeFontStyle: (value: string) => {
+            canvas.getActiveObjects().forEach((object) => {
+                if (isTextType(object.type)) {
+                    (object as any).set({ fontStyle: value })
+                }
+            })
+            canvas.renderAll();
+        },
+        changeFontLinethrough: (value: boolean) => {
+            canvas.getActiveObjects().forEach((object) => {
+                if (isTextType(object.type)) {
+                    (object as any).set({ linethrough: value })
+                }
+            })
+            canvas.renderAll();
+        },
+        changeFontUnderline: (value: boolean) => {
+            canvas.getActiveObjects().forEach((object) => {
+                if (isTextType(object.type)) {
+                    (object as any).set({ underline: value })
+                }
+            })
+            canvas.renderAll();
+        },
+        changeTextAlign: (value: string) => {
+            canvas.getActiveObjects().forEach((object) => {
+                if (isTextType(object.type)) {
+                    (object as any).set({ textAlign: value })
+                }
+            })
+            canvas.renderAll();
+        },
+        changeFontSize: (value: number) => {
+            canvas.getActiveObjects().forEach((object) => {
+                if (isTextType(object.type)) {
+                    (object as any).set({ fontSize: value })
+                }
+            })
+            canvas.renderAll();
+        },
         changeOpacity: (value: number) => {
             canvas.getActiveObjects().forEach((object) => {
-                object.set({opacity: value})
+                object.set({ opacity: value })
             })
+            canvas.renderAll();
+        },
+        changeFontFamily: (value: string) => {
+            setFontFamily(value);
+            canvas.getActiveObjects().forEach((object) => {
+                if (isTextType(object.type)) {
+                    (object as any).set({ fontFamily: value });
+                }
+
+            });
             canvas.renderAll();
         },
         setFillColor: (value: string) => {
@@ -90,7 +172,7 @@ const buildEditor = ({
         }
         ,
         changeStrokeDashArray: (value: number[]) => {
-            setstrokeDashArray(value);
+            setStrokeDashArray(value);
             canvas.getActiveObjects().forEach((object) => {
                 object.set({ strokeDashArray: value });
             });
@@ -103,7 +185,7 @@ const buildEditor = ({
                 if (isTextType(object.type)) {
                     //text types don't have stroke
                     object.set({ fill: value });
-                    return; 
+                    return;
                 }
                 object.set({ stroke: value });
             });
@@ -195,6 +277,83 @@ const buildEditor = ({
             )
             addToCnavas(object);
         },
+        getActiveFontFamily: () => {
+            const selectedObject = selectedObjects[0];
+
+            if (!selectedObject) {
+                return fontFamily;
+            }
+            const value = (selectedObject as any).get("fontFamily") || fontFamily;
+
+            //currently, gradients & patterns are not supported
+            return value as string;
+        },
+        getActiveFontWeight: () => {
+            const selectedObject = selectedObjects[0];
+
+            if (!selectedObject) {
+                return FONT_WEIGHT;
+            }
+            const value = (selectedObject as any).get("fontWeight")  || FONT_WEIGHT;
+
+            //currently, gradients & patterns are not supported
+            return value;
+        },
+        getActiveFontStyle: () => {
+            const selectedObject = selectedObjects[0];
+
+            if (!selectedObject) {
+                return "normal";
+            }
+            const value = (selectedObject as any).get("fontStyle") || "normal";
+
+            //currently, gradients & patterns are not supported
+            return value;
+        },
+        getActiveFontLinethrough: () => {
+            const selectedObject = selectedObjects[0];
+
+            if (!selectedObject) {
+                return false;
+            }
+            const value = (selectedObject as any).get("linethrough") || false;
+
+            //currently, gradients & patterns are not supported
+            return value;
+        },
+        getActiveFontUnderline: () => {
+            const selectedObject = selectedObjects[0];
+
+            if (!selectedObject) {
+                return false;
+            }
+            const value = (selectedObject as any).get("underline") || false;
+
+            //currently, gradients & patterns are not supported
+            return value;
+        },
+        getActiveTextAlign: () => {
+            const selectedObject = selectedObjects[0];
+
+            if (!selectedObject) {
+                return "left";
+            }
+            const value = (selectedObject as any).get("textAlign") || "left";
+
+            //currently, gradients & patterns are not supported
+            return value;
+        },
+        getActiveFontSize: () => {
+            const selectedObject = selectedObjects[0];
+
+            if (!selectedObject) {
+                return FONT_SIZE;
+            }
+            const value = (selectedObject as any).get("fontSize") || FONT_SIZE;
+
+            //currently, gradients & patterns are not supported
+            return value;
+        },
         getActiveFillColor: () => {
             const selectedObject = selectedObjects[0];
 
@@ -255,10 +414,12 @@ export const useEditor = ({
     const [container, setContainer] = useState<HTMLDivElement | null>(null)
     const [selectedObjects, setSelectedObjects] = useState<fabric.Object[]>([]);
 
+
+    const [fontFamily, setFontFamily] = useState(FONT_FAMILY);
     const [fillColor, setFillColor] = useState(FILL_COLOR);
     const [strokeColor, setStrokeColor] = useState(STROKE_COLOR);
     const [strokeWidth, setStrokeWidth] = useState(STROKE_WIDTH);
-    const [strokeDashArray, setstrokeDashArray] = useState<number[]>(STROKE_DASH_ARRAY);
+    const [strokeDashArray, setStrokeDashArray] = useState<number[]>(STROKE_DASH_ARRAY);
     useAutoResize({
         canvas,
         container,
@@ -282,7 +443,9 @@ export const useEditor = ({
                 setStrokeWidth,
                 selectedObjects,
                 strokeDashArray,
-                setstrokeDashArray,
+                setStrokeDashArray,
+                fontFamily,
+                setFontFamily
             });
         }
         return undefined;
@@ -297,7 +460,9 @@ export const useEditor = ({
         setSelectedObjects,
         selectedObjects,
         strokeDashArray,
-        setstrokeDashArray
+        setStrokeDashArray,
+        fontFamily,
+        setFontFamily
     ]);
 
 
