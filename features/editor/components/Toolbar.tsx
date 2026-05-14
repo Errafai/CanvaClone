@@ -5,11 +5,11 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { BsBorderWidth } from "react-icons/bs";
 import { RxTransparencyGrid } from "react-icons/rx";
-import { AlignCenter, AlignLeft, AlignRight, ArrowDown, ArrowUp, ChevronDown, Trash } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, ArrowDown, ArrowUp, ChevronDown, SquareSplitHorizontal, Trash } from "lucide-react";
 import { isTextType } from "../utils";
 import { FaBold, FaItalic, FaStrikethrough, FaUnderline } from "react-icons/fa";
 import { FontSizeInput } from "./FontSizeInput";
-
+import {TbColorFilter} from "react-icons/tb"
 interface ToolbarProps {
     editor: Editor | undefined;
     activeTool: ActiveTool;
@@ -117,7 +117,7 @@ export const Toolbar = ({
 
 
     const isText = isTextType(selectedObjectType);
-    
+    const isImage = selectedObjectType === "image"; 
     if (editor?.selectedObjects.length === 0) {
         return (
             <div className="shrink-0 h-[56px] border-b bg-white w-full flex
@@ -126,6 +126,7 @@ export const Toolbar = ({
     return (
         <div className="shrink-0 h-[56px] border-b bg-white w-full flex
         items-center overflow-auto z-[49] p-2 gap-x-2">
+            {!isImage &&(
             <div className="flex items-center h-full justify-center">
                 <Hint label="Color" side="bottom" sideOffset={5}>
                     <Button
@@ -140,7 +141,7 @@ export const Toolbar = ({
                         </div>
                     </Button>
                 </Hint>
-            </div>
+                </div>)}
                 {!isText && (
                     <div className="flex items-center h-full justify-center">
                         <Hint label="Stroke color" side="bottom" sideOffset={5}>
@@ -284,6 +285,34 @@ export const Toolbar = ({
             </div>)}
             {isText && (<div className="flex items-center h-full justify-center">
                 <FontSizeInput value={properties.fontSize} onChange={onChangeFontSize}/>
+            </div>)}
+            {isImage && (<div className="flex items-center h-full justify-center">
+                <Hint label="filters" side="bottom" sideOffset={5}>
+                    <Button
+                        onClick={() => onChangeActiveTool("filter")}
+                        size="icon"
+                        variant="ghost"
+                        className={cn(
+                            activeTool === "filter" && "bg-gray-100"
+                        )}
+                    >
+                        <TbColorFilter className="size-4" />
+                    </Button>
+                </Hint>
+            </div>)}
+            {isImage && (<div className="flex items-center h-full justify-center">
+                <Hint label="remove Background" side="bottom" sideOffset={5}>
+                    <Button
+                        onClick={() => onChangeActiveTool("remove-bg")}
+                        size="icon"
+                        variant="ghost"
+                        className={cn(
+                            activeTool === "remove-bg" && "bg-gray-100"
+                        )}
+                    >
+                        <SquareSplitHorizontal className="size-4" />
+                    </Button>
+                </Hint>
             </div>)}
                 <div className="flex items-center h-full justify-center">
                     <Hint label="Opacity" side="bottom" sideOffset={5}>

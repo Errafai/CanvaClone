@@ -3,10 +3,16 @@ import { fabric } from "fabric";
 import { useAutoResize } from "./use-auto-resize";
 import { BuildEditorProps, CIRCLE_OPTIONS, Editor, EditorHookProps, FILL_COLOR, FONT_FAMILY, RECTANGLE_OPTIONS, STROKE_COLOR, STROKE_DASH_ARRAY, FONT_WEIGHT, STROKE_WIDTH, TEXT_OPTIONS, TRIANGLE_OPTIONS, FONT_SIZE } from "../types";
 import { useCanvasEvents } from "./use-canvas-events";
-import { isTextType } from "../utils";
+import { createFilter, isTextType } from "../utils";
 import { ITextboxOptions } from "fabric/fabric-impl";
 
+import { object } from "zod";
+import { useClipboard } from "./use-clipboard";
+import { PassThrough } from "stream";
+
 const buildEditor = ({
+    copy,
+    past,
     canvas,
     fillColor,
     setFillColor,
@@ -39,6 +45,21 @@ const buildEditor = ({
         canvas.setActiveObject(object);
     }
     return {
+        onPast: () => past(),
+        onCopy: () => copy(),
+        
+        changeImageFilter: (value: string) => {
+            const objects = canvas.getActiveObjects();
+            objects.forEach((object) => {
+                if (object.type === "image") {
+                    const imageObject = object as fabric.Image;
+                    const effect = createFilter(value);
+                    imageObject.filters = effect ? [effect] : [];
+                    imageObject.applyFilters();
+                    canvas.renderAll()
+                }
+            })
+        },
         addImage: (value: string) => {
             fabric.Image.fromURL(value, (image) => {
                 const workspace = getWorkspace();
@@ -48,8 +69,8 @@ const buildEditor = ({
                 addToCnavas(image);
             },
                 {
-                crossOrigin: "anonymous"
-            })
+                    crossOrigin: "anonymous"
+                })
         },
         delete: () => {
             canvas.getActiveObjects().forEach((object) => {
@@ -294,7 +315,7 @@ const buildEditor = ({
             if (!selectedObject) {
                 return FONT_WEIGHT;
             }
-            const value = (selectedObject as any).get("fontWeight")  || FONT_WEIGHT;
+            const value = (selectedObject as any).get("fontWeight") || FONT_WEIGHT;
 
             //currently, gradients & patterns are not supported
             return value;
@@ -430,10 +451,12 @@ export const useEditor = ({
         setSelectedObjects,
         clearSelectionCallback
     });
-
+    const { copy, past } = useClipboard( { canvas });
     const editor = useMemo(() => {
         if (canvas) {
             return buildEditor({
+                copy,
+                past,
                 canvas,
                 fillColor,
                 setFillColor,
@@ -450,6 +473,8 @@ export const useEditor = ({
         }
         return undefined;
     }, [
+        copy,
+        past,
         canvas,
         fillColor,
         setFillColor,

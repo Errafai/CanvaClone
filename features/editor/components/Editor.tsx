@@ -15,6 +15,9 @@ import { OpacitySidebar } from "./opacity-sidebar";
 import { TextSidebar } from "./TextSidebar";
 import { FontSidebar } from "./FontSideBar";
 import { ImageSidebar } from "./ImageSidebar";
+import { FilterSidebar } from "./FilterSidebar";
+import { AiSidebar } from "./AiSidebar";
+import { RemoveBgSidebar } from "./RemoveBgSidebar";
 
 export const Editor = () => {
     const [activeTool, setActiveTool] = useState<ActiveTool>("select")
@@ -93,6 +96,18 @@ export const Editor = () => {
                     onChangeActiveTool={onChangeActiveTool}
                 />
                 <ImageSidebar editor={editor}
+                    activeTool={activeTool}
+                    onChangeActiveTool={onChangeActiveTool}
+                />
+                <FilterSidebar editor={editor}
+                    activeTool={activeTool}
+                    onChangeActiveTool={onChangeActiveTool}
+                />
+                <AiSidebar editor={editor}
+                activeTool={activeTool}
+                onChangeActiveTool={onChangeActiveTool}
+                />
+                <RemoveBgSidebar editor={editor}
                     activeTool={activeTool}
                     onChangeActiveTool={onChangeActiveTool}
                 />

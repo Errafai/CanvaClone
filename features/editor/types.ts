@@ -24,6 +24,31 @@ export const fonts = [
     "Geneva",
     "Lucida Console",
 ];
+export const filters = [
+    "none",
+    "polaroid",
+    "sepia",
+    "kodachrome",
+    "contrast",
+    "brightness",
+    "greyscale",
+    "brownie",
+    "vintage",
+    "technicolor",
+    "pixelate",
+    "invert",
+    "blur",
+    "sharpen",
+    "emboss",
+    "removecolor",
+    "blacknwhite",
+    "vibrance",
+    "blendcolor",
+    "huerotate",
+    "resize",
+    "saturation",
+    "gamma",
+];
 
 export const selectionDependentTools = [
     "fill",
@@ -80,6 +105,8 @@ export type BuildEditorProps = {
     setStrokeDashArray: (values: number[]) => void;
     fontFamily: string;
     setFontFamily: (value: string) => void;
+    copy: () => void;
+    past: () => void;
 
 }
 
@@ -121,6 +148,9 @@ export interface Editor {
     changeFontSize: (value: number) => void;
     getActiveFontSize: () => number;
     addImage: (value: string) => void;
+    changeImageFilter: (value: string) => void;
+    onPast: () => void;
+    onCopy: () => void;
 }
 
 export const FILL_COLOR = "rgba(0,0,0,1)";
